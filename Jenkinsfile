@@ -6,7 +6,7 @@ pipeline {
         DOCKER_PASS = 'Suhail@5555'
         REPO = 'https://github.com/suhail-12-10/project.git'
         EC2_USER = 'ubuntu'
-        EC2_HOST = '13.53.112.120'
+        EC2_HOST = '16.16.76.129'
     }
 
     stages {
@@ -50,3 +50,4 @@ pipeline {
         }
     }
 }
+
