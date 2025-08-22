@@ -37,18 +37,21 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
-                sh '''
-                ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << EOF
-                  docker pull ${DOCKER_USER}/backend:latest
-                  docker pull ${DOCKER_USER}/frontend:latest
-                  cd ~/project
-                  docker compose down
-                  docker compose up -d
-                EOF
-                '''
+                sshagent(['ec2-ssh-key']) {
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "
+                        docker pull ${DOCKER_USER}/backend:latest &&
+                        docker pull ${DOCKER_USER}/frontend:latest &&
+                        docker stop backend || true &&
+                        docker rm backend || true &&
+                        docker stop frontend || true &&
+                        docker rm frontend || true &&
+                        docker run -d --name backend -p 5000:5000 ${DOCKER_USER}/backend:latest &&
+                        docker run -d --name frontend -p 80:80 ${DOCKER_USER}/frontend:latest
+                    "
+                    '''
+                }
             }
         }
     }
 }
-
-
